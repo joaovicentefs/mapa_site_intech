@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Intech</title>
+    <script src="https://unpkg.com/@panzoom/panzoom/dist/panzoom.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.6.1/mermaid.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css"/>
+    
+    <style>
+        /* Container principal ajustado */
+        .main-container {
+            display: flex;
+            height: 100vh;
+            padding: 2rem;
+            gap: 2rem;
+        }
+
+        /* Sidebar ajustada para altura total */
+        .sidebar {
+            width: 320px;
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            height: calc(100vh - 4rem); /* Altura total menos o padding do container */
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Container do conteúdo principal */
+        .content-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            height: calc(100vh - 4rem); /* Altura total menos o padding do container */
+        }
+
+        /* Container do Mermaid com altura flexível */
+        #mermaid-container {
+            background-color: white !important;
+            flex: 1;
+            min-height: 0; /* Importante para permitir que o flex funcione corretamente */
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #panzoom-wrapper {
+            flex: 1;
+            min-height: 0; /* Importante para permitir que o flex funcione corretamente */
+        }
+
+        /* Configurações dos nós Mermaid */
+        #mermaid-container .node rect { 
+            fill-opacity: 1 !important; 
+        }
+
+        #mermaid-container .nodeLabel { 
+            color: inherit !important; 
+        }
+
+        #mermaid-container .edgePath .path {
+            stroke: #333 !important;
+            stroke-width: 1px !important;
+        }
+
+        #mermaid-container .edgeLabel { 
+            background-color: white !important; 
+        }
+
+        #mermaid-container .cluster-label { 
+            fill: transparent !important; 
+        }
+
+        #mermaid-container .cluster rect {
+            fill: white !important;
+            stroke: none !important;
+        }
+
+        #mermaid-container .label { 
+            font-family: 'Inter', sans-serif !important; 
+        }
+
+        #Diagrama_Principal rect {
+            fill: transparent !important;
+            stroke: none !important;
+        }
+
+        .mermaid {
+            background-color: white !important;
+            height: 100%;
+        }
+
+        /* Legendas */
+        .legends-container {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        /* Tooltip */
+        .tooltip {
+            visibility: hidden;
+            position: absolute;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            max-width: 300px;
+            z-index: 1000;
+        }
+
+        .legend-item:hover .tooltip {
+            visibility: visible;
+        }
+
+        /* Ajustes de scroll */
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* Grid da legenda mais compacto */
+        .legend-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 0.5rem;
+        }
+        .info_add {
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50">
+    <div class="main-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="flex justify-center mb-6">
+                <img src="https://upsites.digital/wp-content/uploads/2023/01/logo.png" alt="UpSites Logo" class="w-40 h-auto"/>
+            </div>
+            
+            <h2 class="text-xl font-bold mb-4 text-gray-800">Informações adicionais:</h2>
+            <div class="text-gray-600 flex-1">
+                <p class="info_add">
+                    <ul>
+                        <li class="info_add">No mapa do site é possível ver o destaque que fizemos para a página de <strong>"Associações"</strong>, creio que podemos passar essa informação sem uma página exclusiva para ela.</li>
+                    <li class="info_add"><strong>Empresa:</strong> Vai ser apenas um item de menu, as página abaixo dela é que serão páginas de fato.</li>
+                    <li class="info_add"><strong>Serviços:</strong> Também será apenas item de menu. O Conteṹdo de fato fica nas páginas abaixo delas,Onde cada serviço tem sua página,sendo que uma delas á uma página mãe, as abaixo dela serão páginas filho, herdando a mesma estrutura mudando o conteúdo.</li>
+                    <li class="info_add"><strong>Obras (Referências):</strong> Vai ter uma página para apresentar um resumo das obras e cada categoria (em roxo) vai agrupar as obras daquele segmento.</li>
+                    <li class="info_add"><strong>Produtos:</strong> Da mesma forma que em Serviços, o primeiro produto será página mãe e os outros páginas filho. A diferença é que neste caso a  página de produtos tem conteúdo para falar sobre a Seal For Life Industries. </li>
+                    <li class="info_add"><strong>Mídia (blog):</strong> Essa página tenho dúvida se deve existir porque ela só tem conteúdos muito antigos. Mas na proposta mantivemnos.</li>
+                    </ul>
+                </p>
+            </div>
+        </div>
+
+        <!-- Container Principal -->
+        <div class="content-container">
+            <div id="mermaid-container" class="border border-gray-100 rounded-lg">
+                <div id="panzoom-wrapper" class="cursor-grab active:cursor-grabbing" style="transform-origin: 0 0;">
+                    <div class="mermaid">
+                        ---
+                        config:
+                            flowchart:
+                                curve: basis
+                                padding: 20
+                        ---
+                        flowchart TD
+                        %% Configuração de links e curvas mais suaves
+                        linkStyle default stroke-width:1px,stroke:#333
+                        %% Diagrama Principal (Sem borda)
+                        subgraph Diagrama_Principal["Spiecapag Intech"]
+                            direction TB
+                            Cliente( ):::invisible
+                            Cliente~~~node_1(Home):::pagInclusa
+                            Cliente~~~node_2(Empresa):::nep
+                            node_3(Quem somos):::pagextramd
+                            node_2-->node_3
+                            node_4(Compromissos):::pagextramd
+                            node_3-->node_4
+                            node_5(Certificações):::pagextramd
+                            node_4-->node_5
+                            node_6(Associações):::pagexcluir
+                            node_5-->node_6
+                            node_7(Conduta e ética):::pagextramd
+                            node_6-->node_7
+                            Cliente~~~node_8(Serviços):::nep
+                            node_9(Furo direcional):::pagextramd
+                            node_8-->node_9
+                            node_10(Crav. Penumática):::pagextrafl
+                            node_9-->node_10
+                            node_11(Const. e Montag.):::pagextrafl
+                            node_10-->node_11
+                            node_12(Manut. de Redes):::pagextrafl
+                            node_11-->node_12
+                            Cliente~~~node_13(Obras):::pagInclusa
+                            node_14(Cruzamentos):::cpt
+                            node_13-->node_14
+                            node_15(Const. e Montag.):::cpt
+                            node_14-->node_15
+                            node_16(Shore Approach):::cpt
+                            node_15-->node_16
+                            node_17(Pç. de Petró.):::cpt
+                            node_16-->node_17
+                            node_18(Est. de Gás):::cpt
+                            node_17-->node_18
+                            Cliente~~~node_19(Produtos):::pagInclusa
+                            node_20(Covalence):::pagextramd
+                            node_19-->node_20
+                            node_21(Anodeflex):::pagextrafl
+                            node_20-->node_21
+                            node_22(Powercrete):::pagextrafl
+                            node_21-->node_22
+                            node_23(Polyken):::pagextrafl
+                            node_22-->node_23
+                            node_24(Stopaq):::pagextrafl
+                            node_23-->node_24
+                            Cliente~~~node_25(Na mídia):::blog
+                            Cliente~~~node_26(Contato):::pagInclusa
+                            node_27(Denúncia):::pagextramd
+                            node_26-->node_27
+                        end
+                        %% Estilos dos nós
+                        classDef invisible fill:none,stroke:none
+                        classDef default fill:#d2d2d2,stroke-width:0px,rx:4px
+                        classDef pagInclusa fill:#ffe800,stroke:none,color:black,rx:4px
+                        classDef nep fill:#f2f2f2,stroke:#000,stroke-width:1px,color:black,rx:4px
+                        classDef linkexterno fill:white,stroke:#d2d2d2,stroke-width:1px,stroke-dasharray:5,rx:4px
+                        classDef cpt fill:#c903c9,color:white,rx:4px
+                        classDef blog fill:#ff9900,color:white,rx:4px
+                        classDef pagextracp fill:#cc0000,color:white,rx:4px
+                        classDef pagextramd fill:#4a86e8,color:white,rx:4px
+                        classDef pagextrasp fill:#45818e,color:white,rx:4px
+                        classDef pagextrafl fill:#93c47d,color:white,rx:4px
+                        classDef pagcatalogo fill:#7a5230,color:white,rx:4px
+                        classDef pagexcluir fill:#ff6b6b,stroke:#ffd700,stroke-width:2px,stroke-dasharray:5,color:black,rx:4px
+                        %% Aplicação de classes ao diagrama
+                        class Diagrama_Principal titulo_mapa
+                        class Diagrama_Principal fullchart
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-sm text-gray-600 text-center mt-2">
+                🖱️ Arraste para mover o diagrama | Ctrl + Scroll do mouse para zoom
+            </div>
+
+            <!-- Legenda mais compacta -->
+            <div class="legends-container">
+                <div class="legend-grid">
+                    <div class="legend-item relative flex items-center gap-2" data-tippy-content="Página que faz parte do orçamento base.">
+                        <div class="w-4 h-4 rounded" style="background-color: #ffe800"></div>
+                        <span class="text-sm">Página Inclusa</span>
+                    </div>
+
+                    <div class="legend-item relative flex items-center gap-2" data-tippy-content="Não é contabilizada como página e nem é cobrada. Mas é listada no menu.">
+                        <div class="w-4 h-4 rounded bg-white border border-dashed border-gray-300"></div>
+                        <span class="text-sm">Link Externo</span>
+                    </div>
+
+                    <div class="legend-item relative flex items-center gap-2" data-tippy-content="Não é contabilizada como página e nem é cobrada. Mas é listada no menu.">
+                        <div class="w-4 h-4 rounded" style="background-color: #f2f2f2; border: 1px solid #000"></div>
+                        <span class="text-sm">Item de Menu</span>
+                    </div>
+
+                    <div class="legend-item relative flex items-center gap-2" data-tippy-content="Considere o &quot;Custom Post Type&quot; (CPT) como um modelo de conteúdo especializado. Em um site de fotografia, por exemplo, você poderia criar um CPT chamado &quot;Galeria&quot; para organizar e exibir imagens. Cada CPT possui campos e opções de personalização próprios, facilitando a gestão e criação de páginas similares.
+                    ">
+                        <div class="w-4 h-4 rounded" style="background-color: #c903c9"></div>
+                        <span class="text-sm">Custom Post Type</span>
+                    </div>
+
+                    <div class="legend-item relative flex items-center gap-2" data-tippy-content="Recurso para publicação de conteúdo atualizado no site. Ele permite criar e organizar posts com texto, imagens e links, geralmente exibidos em ordem cronológica. Cada post tem campos específicos, como título, autor e data, facilitando a criação e a gestão de novos conteúdos, além de contribuir para manter o site dinâmico e atrair visitantes.">
+                        <div class="w-4 h-4 rounded" style="background-color: #ff9900"></div>
+                        <span class="text-sm">Blog</span>
+                    </div>
+
+                    <div class="legend-item relative flex items-center gap-2" data-tippy-content="Página adicional ao projeto com mais complexidade visual ou funcional.">
+                        <div class="w-4 h-4 rounded" style="background-color: #cc0000"></div>
+                        <span class="text-sm">Página Complexa</span>
+                    </div>
+
+                    <div class="legend-item relative flex items-center gap-2" data-tippy-content="Página adicional ao projeto com alguns recursos funcionais ou visuais.">
+                        <div class="w-4 h-4 rounded" style="background-color: #4a86e8"></div>
+                        <span class="text-sm">Página Média</span>
+                    </div>
+
+                    <div class="legend-item relative flex items-center gap-2" data-tippy-content="Página adicional ao projeto mas com recursos visuais e funcionais mais simples.">
+                        <div class="w-4 h-4 rounded" style="background-color: #45818e"></div>
+                        <span class="text-sm">Página Simples</span>
+                    </div>
+
+                    <div class="legend-item relative flex items-center gap-2" data-tippy-content="Página adicional ao projeto que é derivada de uma outra página com estrutura e tamaho similar, sendo modificado o seu conteúdo. ">
+                        <div class="w-4 h-4 rounded" style="background-color: #93c47d"></div>
+                        <span class="text-sm">Página Filho</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', function () {
+            mermaid.initialize({ 
+                startOnLoad: true,
+                flowchart: {
+                    curve: 'basis',
+                    padding: 20
+                }
+            });
+
+            // Inicialização dos tooltips
+            tippy('.legend-item', {
+                content: (reference) => reference.getAttribute('data-tippy-content'),
+                placement: 'top',
+                arrow: true,
+                theme: 'custom',
+                maxWidth: 300,
+            });
+
+            // Inicialização do Panzoom
+            setTimeout(() => {
+                const element = document.getElementById('panzoom-wrapper');
+                
+                const panzoom = Panzoom(element, {
+                    maxScale: 2.5,
+                    minScale: 0.75,
+                    step: 0.03,
+                    zoomSpeed: 0.05,
+                    smoothScale: true,
+                    beforeWheel: function(e) {
+                        if (!e.ctrlKey) return true;
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+
+                element.addEventListener('wheel', function(e) {
+                    if (!e.ctrlKey) return;
+                    e.preventDefault();
+                    const delta = e.deltaY;
+                    
+                    if (delta > 0) {
+                        panzoom.zoomOut(null, { step: 0.15 });
+                    } else {
+                        panzoom.zoomIn(null, { step: 0.15 });
+                    }
+                });
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
